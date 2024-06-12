@@ -1,0 +1,154 @@
+document.addEventListener('DOMContentLoaded', () => {
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const vehicles = {
+        neonBlade: {
+            name: 'Neon Blade',
+            speed: 8,
+            handling: 7,
+            shield: 5
+        },
+        cyberSpeeder: {
+            name: 'Cyber Speeder',
+            speed: 6,
+            handling: 9,
+            shield: 6
+        },
+        futuristicTank: {
+            name: 'Futuristic Tank',
+            speed: 5,
+            handling: 6,
+            shield: 9
+        }
+    };
+
+    let selectedVehicle = vehicles.neonBlade;
+
+    const player = {
+        x: canvas.width / 2,
+        y: canvas.height - 100,
+        width: 50,
+        height: 100,
+        speed: selectedVehicle.speed,
+        handling: selectedVehicle.handling,
+        shield: selectedVehicle.shield,
+        dx: 0,
+        dy: 0
+    };
+
+    function drawPlayer() {
+        ctx.fillStyle = 'cyan';
+        ctx.fillRect(player.x, player.y, player.width, player.height);
+    }
+
+    function clear() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function newPos() {
+        player.x += player.dx;
+        player.y += player.dy;
+
+        detectWalls();
+    }
+
+    function detectWalls() {
+        if (player.x < 0) {
+            player.x = 0;
+        }
+        if (player.x + player.width > canvas.width) {
+            player.x = canvas.width - player.width;
+        }
+        if (player.y < 0) {
+            player.y = 0;
+        }
+        if (player.y + player.height > canvas.height) {
+            player.y = canvas.height - player.height;
+        }
+    }
+
+    function update() {
+        clear();
+        drawPlayer();
+        newPos();
+        requestAnimationFrame(update);
+    }
+
+    function moveUp() {
+        player.dy = -player.speed;
+    }
+
+    function moveDown() {
+        player.dy = player.speed;
+    }
+
+    function moveRight() {
+        player.dx = player.speed;
+    }
+
+    function moveLeft() {
+        player.dx = -player.speed;
+    }
+
+    function keyDown(e) {
+        if (e.key === 'ArrowRight' || e.key === 'd') {
+            moveRight();
+        } else if (e.key === 'ArrowLeft' || e.key === 'a') {
+            moveLeft();
+        } else if (e.key === 'ArrowUp' || e.key === 'w') {
+            moveUp();
+        } else if (e.key === 'ArrowDown' || e.key === 's') {
+            moveDown();
+        }
+    }
+
+    function keyUp(e) {
+        if (
+            e.key === 'ArrowRight' ||
+            e.key === 'ArrowLeft' ||
+            e.key === 'ArrowUp' ||
+            e.key === 'ArrowDown' ||
+            e.key === 'd' ||
+            e.key === 'a' ||
+            e.key === 'w' ||
+            e.key === 's'
+        ) {
+            player.dx = 0;
+            player.dy = 0;
+        }
+    }
+
+    document.addEventListener('keydown', keyDown);
+    document.addEventListener('keyup', keyUp);
+
+    // UI for selecting a vehicle
+    const ui = document.getElementById('ui');
+    ui.innerHTML = `
+        <button id="neonBladeBtn">Neon Blade</button>
+        <button id="cyberSpeederBtn">Cyber Speeder</button>
+        <button id="futuristicTankBtn">Futuristic Tank</button>
+        <button id="startBtn">Start Game</button>
+    `;
+
+    document.getElementById('neonBladeBtn').addEventListener('click', () => selectVehicle('neonBlade'));
+    document.getElementById('cyberSpeederBtn').addEventListener('click', () => selectVehicle('cyberSpeeder'));
+    document.getElementById('futuristicTankBtn').addEventListener('click', () => selectVehicle('futuristicTank'));
+    document.getElementById('startBtn').addEventListener('click', startGame);
+
+    function selectVehicle(vehicleKey) {
+        selectedVehicle = vehicles[vehicleKey];
+        player.speed = selectedVehicle.speed;
+        player.handling = selectedVehicle.handling;
+        player.shield = selectedVehicle.shield;
+        alert(`Selected Vehicle: ${selectedVehicle.name}`);
+    }
+
+    function startGame() {
+        update();
+        ui.style.display = 'none';
+    }
+});

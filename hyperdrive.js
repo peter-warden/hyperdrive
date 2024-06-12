@@ -5,12 +5,37 @@ document.addEventListener('DOMContentLoaded', () => {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
+    const vehicles = {
+        kunai: {
+            name: 'Kunai',
+            speed: 8,
+            handling: 7,
+            shield: 5
+        },
+        kitana: {
+            name: 'Kitana',
+            speed: 6,
+            handling: 9,
+            shield: 6
+        },
+        kiseru: {
+            name: 'Kiseru',
+            speed: 5,
+            handling: 6,
+            shield: 9
+        }
+    };
+
+    let selectedVehicle = vehicles.kunai;
+
     const player = {
         x: canvas.width / 2,
         y: canvas.height - 100,
         width: 50,
         height: 100,
-        speed: 5,
+        speed: selectedVehicle.speed,
+        handling: selectedVehicle.handling,
+        shield: selectedVehicle.shield,
         dx: 0,
         dy: 0
     };
@@ -32,22 +57,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function detectWalls() {
-        // Left wall
         if (player.x < 0) {
             player.x = 0;
         }
-
-        // Right Wall
         if (player.x + player.width > canvas.width) {
             player.x = canvas.width - player.width;
         }
-
-        // Top wall
         if (player.y < 0) {
             player.y = 0;
         }
-
-        // Bottom wall
         if (player.y + player.height > canvas.height) {
             player.y = canvas.height - player.height;
         }
@@ -107,5 +125,30 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('keydown', keyDown);
     document.addEventListener('keyup', keyUp);
 
-    update();
+    // UI for selecting a vehicle
+    const ui = document.getElementById('ui');
+    ui.innerHTML = `
+        <button id="kunaiBtn">Kunai</button>
+        <button id="kitanaBtn">Kitana</button>
+        <button id="kiseruBtn">Kiseru</button>
+        <button id="startBtn">Start Game</button>
+    `;
+
+    document.getElementById('kunaiBtn').addEventListener('click', () => selectVehicle('kunai'));
+    document.getElementById('kitanaBtn').addEventListener('click', () => selectVehicle('kitana'));
+    document.getElementById('kiseruBtn').addEventListener('click', () => selectVehicle('kiseru'));
+    document.getElementById('startBtn').addEventListener('click', startGame);
+
+    function selectVehicle(vehicleKey) {
+        selectedVehicle = vehicles[vehicleKey];
+        player.speed = selectedVehicle.speed;
+        player.handling = selectedVehicle.handling;
+        player.shield = selectedVehicle.shield;
+        alert(`Selected Vehicle: ${selectedVehicle.name}`);
+    }
+
+    function startGame() {
+        update();
+        ui.style.display = 'none';
+    }
 });
